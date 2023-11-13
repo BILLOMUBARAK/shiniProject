@@ -4,3 +4,18 @@ author: "obj2"
 date: "2023-11-13"
 output: github_document
 ---
+
+### chargement des données
+```{r}
+amsterdam <- read.csv("data/amsterdam_weekends.csv")
+athens <- read.csv("data/athens_weekends.csv")
+barcelona <- read.csv("data/barcelona_weekends.csv")
+berlin <- read.csv("data/berlin_weekends.csv")
+budapest <- read.csv("data/budapest_weekends.csv")
+lisbon <- read.csv("data/lisbon_weekends.csv")
+london <- read.csv("data/london_weekends.csv")
+paris <- read.csv("data/paris_weekends.csv")
+rome <- read.csv("data/rome_weekends.csv")
+vienna <- read.csv("data/vienna_weekends.csv")
+
+```
