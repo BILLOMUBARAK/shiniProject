@@ -1,0 +1,6 @@
+---
+title: "objectif2"
+author: "obj2"
+date: "2023-11-13"
+output: github_document
+---
