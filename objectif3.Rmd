@@ -2,5 +2,5 @@
 title: "objectif3"
 author: "obj3"
 date: "2023-11-13"
-output: html_document
+output: github_document
 ---
