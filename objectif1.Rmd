@@ -4,6 +4,10 @@ author: "obj1"
 date: "2023-11-13"
 output: github_document
 ---
+### chargement des librairies
+```{r}
+library(ggplot2)
+```
 
 ### chargement des données
 ```{r}
@@ -21,4 +25,56 @@ vienna <- read.csv("data/vienna_weekends.csv")
 ```
 
 
+###creation de fonction pour automatiser le processus
+
+```{r}
+graphe<-function(data){
+  
+  line_chart<- ggplot(data,aes(x=dist, y=realSum))+
+    geom_line(color="blue")+
+    labs(title="Prix des Airbnb en fonction de la distance au
+         centre-ville",
+         x="Distance au centre-ville",
+         y="Prix total de l'annonce") +
+    theme_minimal()
+  
+  line_chart
+  
+}
+```
+
+
+```{r}
+graphe(amsterdam)
+```
+
+```{r}
+generate_airbnb_plots <- function(data) {
+  # Charger la bibliothèque ggplot2
+  library(ggplot2)
+
+  # Créer un graphique en lignes avec ggplot
+  line_chart <- ggplot(data, aes(x = dist, y = realSum, group = 1)) +
+    geom_line(color = "blue") +
+    labs(title = "Prix des Airbnb en fonction de la distance au centre-ville",
+         x = "Distance au centre-ville",
+         y = "Prix total de l'annonce") +
+    theme_minimal()
+
+  # Créer des graphiques de boxplots avec courbe de tendance pour chaque ville
+  boxplots <- ggplot(data, aes(x = as.factor(dist), y = realSum, fill = as.factor(dist))) +
+    geom_boxplot() +
+    geom_point(position = position_jitter(width = 0.2), alpha = 0.7) +
+    labs(title = "Boxplots avec Courbe de Tendance pour chaque ville",
+         x = "Distance au centre-ville",
+         y = "Prix total de l'annonce") +
+    theme_minimal()
+
+  # Afficher les graphiques
+  line_chart
+  boxplots
+}
+
+
+```
 
