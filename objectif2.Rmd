@@ -7,6 +7,7 @@ output: github_document
 
 ### chargement des données
 ```{r}
+library(ggplot2)
 amsterdam <- read.csv("data/amsterdam_weekends.csv")
 athens <- read.csv("data/athens_weekends.csv")
 barcelona <- read.csv("data/barcelona_weekends.csv")
@@ -18,4 +19,28 @@ paris <- read.csv("data/paris_weekends.csv")
 rome <- read.csv("data/rome_weekends.csv")
 vienna <- read.csv("data/vienna_weekends.csv")
 
+```
+
+###Fonction Histogramme nombre de personnes pour dist
+```{r}
+histo_obj2<-function(data){
+  
+  histogram<- ggplot(amsterdam, aes(x = dist, fill = as.factor(person_capacity))) +
+  geom_histogram(binwidth = 0.1, position = "identity") +
+  labs(
+    title = "Quantité des personnes pouvant être accueillies en fonction de la distance au centre-ville",
+    x = "Distance au centre-ville",
+    fill = "Capacité de personne"
+  ) +
+  theme_minimal()
+  
+  histogram
+  
+}
+```
+
+###Exemple d'utilisation de la fonction histo_obj2
+```{r}
+histo_obj2(amsterdam)
+histo_obj2(rome)
 ```

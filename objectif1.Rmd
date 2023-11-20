@@ -7,6 +7,7 @@ output: github_document
 ### chargement des librairies
 ```{r}
 library(ggplot2)
+library(dplyr)
 ```
 
 ### chargement des données
@@ -22,8 +23,31 @@ paris <- read.csv("data/paris_weekends.csv")
 rome <- read.csv("data/rome_weekends.csv")
 vienna <- read.csv("data/vienna_weekends.csv")
 
+cityList = list(amsterdam, athens, barcelona, berlin, budapest, lisbon, london, paris, rome, vienna)
+colorVector = c("orange", "blue", "red", "yellow", "chartreuse1", "seagreen", "brown", "thistle","cadetblue1", "gold1")
 ```
 
+###Graphe Ligne Combiné
+```{r}
+citiesPriceToDistComparison <- function(dataset_list, colorVector) {
+  
+  combined_data <- bind_rows(dataset_list, .id = "city")
+  
+  combined_plot <- ggplot(combined_data, aes(x = dist, y = realSum, color = city)) +
+    geom_line() +
+    labs(
+      title = "Prix des Airbnb en fonction de la distance au centre-ville",
+      x = "Distance au centre-ville",
+      y = "Prix total de l'annonce"
+    ) +
+    scale_color_manual(values = colorVector) +
+    theme_minimal()
+  
+  return(combined_plot)
+}
+
+citiesPriceToDistComparison(cityList, colorVector)
+```
 
 ###creation de fonction pour automatiser le processus
 
@@ -46,8 +70,10 @@ graphe<-function(data){
 
 ```{r}
 graphe(amsterdam)
+graphe(athens)
 ```
 
+###FONCTION 2 HS
 ```{r}
 generate_airbnb_plots <- function(data) {
   # Charger la bibliothèque ggplot2
@@ -77,4 +103,5 @@ generate_airbnb_plots <- function(data) {
 
 
 ```
+
 
