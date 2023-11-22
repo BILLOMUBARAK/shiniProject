@@ -23,37 +23,7 @@ paris <- read.csv("data/paris_weekends.csv")
 rome <- read.csv("data/rome_weekends.csv")
 vienna <- read.csv("data/vienna_weekends.csv")
 
-cityList = list(amsterdam, athens, barcelona, berlin, budapest, lisbon, london, paris, rome, vienna)
-colorVector = c("orange", "blue", "red", "yellow", "chartreuse1", "seagreen", "brown", "thistle","cadetblue1", "gold1")
 
-combined_data <- bind_rows(cityList, .id = "city")
-  
-combined_data$city <- replace(combined_data$city, combined_data$city==1, "Amsterdam")
-combined_data$city <- replace(combined_data$city, combined_data$city==2, "Athènes")
-combined_data$city <- replace(combined_data$city, combined_data$city==3, "Barcelone")
-combined_data$city <- replace(combined_data$city, combined_data$city==4, "Berlin")
-combined_data$city <- replace(combined_data$city, combined_data$city==5, "Budapest")
-combined_data$city <- replace(combined_data$city, combined_data$city==6, "Lisbonne")
-combined_data$city <- replace(combined_data$city, combined_data$city==7, "Londres")
-combined_data$city <- replace(combined_data$city, combined_data$city==8, "Paris")
-combined_data$city <- replace(combined_data$city, combined_data$city==9, "Rome")
-combined_data$city <- replace(combined_data$city, combined_data$city==10, "Vienne")
-
-avg_price_vector = c()
-avg_dist_vector = c()
-max_dist_vector = c()
-
-cityListNames = c("Amsterdam","Athènes","Barcelone","Berlin","Budapest","Lisbonne","Londres","Paris","Rome","Vienne")
-
-for (i in cityList) {
-  avg_price_vector <- append(avg_price_vector, round(mean(i$realSum), digits=2))
-  avg_dist_vector <- append(avg_dist_vector, mean(i$dist))
-  max_dist_vector <- append(max_dist_vector, max(i$dist))
-}
-
-global = data.frame(city <- cityListNames, avg_realSum <- avg_price_vector, avg_dist <- avg_dist_vector, city_size <- max_dist_vector)
-
-combined_data_by_density <- combined_data %>% arrange(factor(city, levels = c('Amsterdam', 'Berlin', 'Barcelone', 'Vienne', 'Budapest', 'Athènes', 'Lisbonne', 'Paris', 'Rome', 'Londres')))
 ```
 
 ###2A: Fonction pour voir le prix par rapport à la distance au centre-ville dans une seule ville (À transformer en geom point avec une ligne de regression)
@@ -62,7 +32,9 @@ combined_data_by_density <- combined_data %>% arrange(factor(city, levels = c('A
 graphe<-function(data){
   
   line_chart<- ggplot(data,aes(x=dist, y=realSum))+
-    geom_line(color="blue")+
+    geom_point(color="blue")+
+    # Regression line
+    geom_smooth(method = "lm", se = FALSE, color = "red")+
     labs(title="Prix des Airbnb en fonction de la distance au
          centre-ville",
          x="Distance au centre-ville",
@@ -80,26 +52,107 @@ graphe(amsterdam)
 graphe(athens)
 ```
 
-###2B: Fonction Histogramme nombre de personnes pour dist
+
+###2b Graphe (geom_line) avec à la fois le prix en fonction de la distance à l'arrêt de metro le plus proche et aussi la distance au centre-ville (Double axe y)
 ```{r}
-histo_obj2<-function(data){
+library(ggplot2)
+
+graphe <- function(data) {
   
-  histogram<- ggplot(amsterdam, aes(x = dist, fill = as.factor(person_capacity))) +
-  geom_histogram(binwidth = 0.1, position = "identity") +
-  labs(
-    title = "Quantité des personnes pouvant être accueillies en fonction de la distance au centre-ville",
-    x = "Distance au centre-ville",
-    fill = "Capacité de personne"
-  ) +
-  theme_minimal()
+  # Line graph with two y-axes
+  dual_axis_chart <- ggplot(data, aes(x = dist)) +
+    
+    # Price in relation to distance to the nearest metro station
+    geom_line(aes(y = realSum, color = "blue"), size = 1) +
+    
+    # Distance to the city center on the secondary y-axis
+    geom_line(aes(y = metro_dist, color = "red"), size = 1) +
+    
+    scale_y_continuous(
+      name = "Prix total de l'annonce",
+      sec.axis = sec_axis(~., name = "Distance au métro le plus proche")
+    ) +
+    
+    labs(
+      title = "Prix des Airbnb en fonction de la distance au métro et au centre-ville",
+      x = "Distance au centre-ville"
+    ) +
+    
+    theme_minimal() +
+    scale_color_manual(values = c("blue", "red"))
   
-  histogram
-  
+  dual_axis_chart
 }
+
+# Example usage
+# Assuming your data frame is named "your_data"
+# Replace "your_data" with the actual name of your data frame
+graphe(amsterdam)
+
+```
+
+
+###2c: Fonction Histogramme nombre de personnes pour dist
+```{r}
+library(ggplot2)
+
+graphe_histogramme <- function(data) {
+  
+  # Histogram of the number of people for each distance value
+  histogram_chart <- ggplot(data, aes(x = dist)) +
+    geom_histogram(binwidth = 1, fill = "#0072B2", color = "white") +
+    
+    labs(
+      title = "Histogramme du nombre de personnes en fonction de la distance",
+      x = "Distance au centre-ville",
+      y = "Nombre de personnes"
+    ) +
+    
+    theme_minimal()
+  
+  histogram_chart
+}
+
+
 ```
 
 ###Exemple d'utilisation de la fonction histo_obj2
 ```{r}
-histo_obj2(amsterdam)
-histo_obj2(rome)
+graphe_histogramme(amsterdam)
+graphe_histogramme(paris)
 ```
+
+
+
+```{r}
+library(ggplot2)
+
+graphe_violon <- function(data) {
+  
+  # Violin plot with points
+  violin_chart <- ggplot(data, aes(x = room_type, y = realSum, color = room_type)) +
+    geom_violin() +
+    geom_point(position = position_jitter(width = 0.2, height = 0), alpha = 0.5) +
+    
+    labs(
+      title = "Prix des Airbnb en fonction du type de chambre",
+      x = "Type de chambre",
+      y = "Prix total de l'annonce"
+    ) +
+    
+    theme_minimal() +
+    scale_color_manual(values = c("#0072B2", "#D55E00", "#009E73"))
+  
+  violin_chart
+}
+
+# Example usage
+# Assuming your data frame is named "your_data"
+# Replace "your_data" with the actual name of your data frame
+graphe_violon(amsterdam)
+
+```
+
+
+
+
