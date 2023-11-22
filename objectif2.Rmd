@@ -4,10 +4,14 @@ author: "obj2"
 date: "2023-11-13"
 output: github_document
 ---
+### chargement des librairies
+```{r}
+library(ggplot2)
+library(dplyr)
+```
 
 ### chargement des données
 ```{r}
-library(ggplot2)
 amsterdam <- read.csv("data/amsterdam_weekends.csv")
 athens <- read.csv("data/athens_weekends.csv")
 barcelona <- read.csv("data/barcelona_weekends.csv")
@@ -19,9 +23,64 @@ paris <- read.csv("data/paris_weekends.csv")
 rome <- read.csv("data/rome_weekends.csv")
 vienna <- read.csv("data/vienna_weekends.csv")
 
+cityList = list(amsterdam, athens, barcelona, berlin, budapest, lisbon, london, paris, rome, vienna)
+colorVector = c("orange", "blue", "red", "yellow", "chartreuse1", "seagreen", "brown", "thistle","cadetblue1", "gold1")
+
+combined_data <- bind_rows(cityList, .id = "city")
+  
+combined_data$city <- replace(combined_data$city, combined_data$city==1, "Amsterdam")
+combined_data$city <- replace(combined_data$city, combined_data$city==2, "Athènes")
+combined_data$city <- replace(combined_data$city, combined_data$city==3, "Barcelone")
+combined_data$city <- replace(combined_data$city, combined_data$city==4, "Berlin")
+combined_data$city <- replace(combined_data$city, combined_data$city==5, "Budapest")
+combined_data$city <- replace(combined_data$city, combined_data$city==6, "Lisbonne")
+combined_data$city <- replace(combined_data$city, combined_data$city==7, "Londres")
+combined_data$city <- replace(combined_data$city, combined_data$city==8, "Paris")
+combined_data$city <- replace(combined_data$city, combined_data$city==9, "Rome")
+combined_data$city <- replace(combined_data$city, combined_data$city==10, "Vienne")
+
+avg_price_vector = c()
+avg_dist_vector = c()
+max_dist_vector = c()
+
+cityListNames = c("Amsterdam","Athènes","Barcelone","Berlin","Budapest","Lisbonne","Londres","Paris","Rome","Vienne")
+
+for (i in cityList) {
+  avg_price_vector <- append(avg_price_vector, round(mean(i$realSum), digits=2))
+  avg_dist_vector <- append(avg_dist_vector, mean(i$dist))
+  max_dist_vector <- append(max_dist_vector, max(i$dist))
+}
+
+global = data.frame(city <- cityListNames, avg_realSum <- avg_price_vector, avg_dist <- avg_dist_vector, city_size <- max_dist_vector)
+
+combined_data_by_density <- combined_data %>% arrange(factor(city, levels = c('Amsterdam', 'Berlin', 'Barcelone', 'Vienne', 'Budapest', 'Athènes', 'Lisbonne', 'Paris', 'Rome', 'Londres')))
 ```
 
-###Fonction Histogramme nombre de personnes pour dist
+###2A: Fonction pour voir le prix par rapport à la distance au centre-ville dans une seule ville (À transformer en geom point avec une ligne de regression)
+
+```{r}
+graphe<-function(data){
+  
+  line_chart<- ggplot(data,aes(x=dist, y=realSum))+
+    geom_line(color="blue")+
+    labs(title="Prix des Airbnb en fonction de la distance au
+         centre-ville",
+         x="Distance au centre-ville",
+         y="Prix total de l'annonce") +
+    theme_minimal()
+  
+  line_chart
+  
+}
+```
+
+
+```{r}
+graphe(amsterdam)
+graphe(athens)
+```
+
+###2B: Fonction Histogramme nombre de personnes pour dist
 ```{r}
 histo_obj2<-function(data){
   

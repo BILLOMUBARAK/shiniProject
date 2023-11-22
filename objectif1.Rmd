@@ -39,104 +39,95 @@ combined_data$city <- replace(combined_data$city, combined_data$city==8, "Paris"
 combined_data$city <- replace(combined_data$city, combined_data$city==9, "Rome")
 combined_data$city <- replace(combined_data$city, combined_data$city==10, "Vienne")
 
+avg_price_vector = c()
+avg_dist_vector = c()
+max_dist_vector = c()
+
+cityListNames = c("Amsterdam","Athènes","Barcelone","Berlin","Budapest","Lisbonne","Londres","Paris","Rome","Vienne")
+
+for (i in cityList) {
+  avg_price_vector <- append(avg_price_vector, round(mean(i$realSum), digits=2))
+  avg_dist_vector <- append(avg_dist_vector, mean(i$dist))
+  max_dist_vector <- append(max_dist_vector, max(i$dist))
+}
+
+global = data.frame(city <- cityListNames, avg_realSum <- avg_price_vector, avg_dist <- avg_dist_vector, city_size <- max_dist_vector)
+
 combined_data_by_density <- combined_data %>% arrange(factor(city, levels = c('Amsterdam', 'Berlin', 'Barcelone', 'Vienne', 'Budapest', 'Athènes', 'Lisbonne', 'Paris', 'Rome', 'Londres')))
 ```
 
-###Graphe Ligne Combiné
+###1A: Graphe Ligne Combiné des prix par rapport à la distance du centre-ville dans toutes les villes
+###À considérer si on fix des limites pour plus de visibilité
 ```{r}
-citiesPriceToDistComparison <- function(dataList, colorVector) {
-  
-  combined_plot <- ggplot(dataList, aes(x = dist, y = realSum, color = city)) +
-    geom_line() +
-    labs(
-      title = "Prix des Airbnb en fonction de la distance au centre-ville",
-      x = "Distance au centre-ville",
-      y = "Prix total de l'annonce",
-      color = "Ville"
-    ) +
-    scale_color_manual(values = colorVector) +
-    theme_minimal()
-  
-  return(combined_plot)
-}
-
-citiesPriceToDistComparison(combined_data, colorVector)
+combined_plot_line <- ggplot(combined_data, aes(x = dist, y = realSum, color = city)) +
+  geom_line() +
+  labs(
+    title = "Prix des Airbnb en fonction de la distance au centre-ville",
+    x = "Distance au centre-ville",
+    y = "Prix total de l'annonce",
+    color = "Ville"
+  ) +
+  scale_color_manual(values = colorVector) +
+  theme_minimal()
+combined_plot_line
 ```
 
-###Graphe Densité pour plus de visibilité
-```{r}
-citiesPriceComparison <- function(dataList, colorVector) {
-  
-  combined_plot <- ggplot(dataList, aes(x = realSum, after_stat(count), fill = city)) +
-    geom_density(position="stack") +
-    labs(
-      title = "Prix des Airbnb",
-      x = "Prix total de l'annonce",
-      color = "Ville"
-    ) +
-    scale_color_manual(values = colorVector) +
-    theme_minimal() +
-    xlim(0,2300)
-  
-  return(combined_plot)
-}
-
-citiesPriceComparison(combined_data_by_density, colorVector)
-```
-
-###creation de fonction pour automatiser le processus
+###1B: 1B: Graphe Nuage de point pour le prix moyen en fonction de la distance moyenne de la ville avec la taille des points variant en fonction de la taille de la ville (dist max)
 
 ```{r}
-graphe<-function(data){
-  
-  line_chart<- ggplot(data,aes(x=dist, y=realSum))+
-    geom_line(color="blue")+
-    labs(title="Prix des Airbnb en fonction de la distance au
-         centre-ville",
-         x="Distance au centre-ville",
-         y="Prix total de l'annonce") +
-    theme_minimal()
-  
-  line_chart
-  
-}
+combined_plot_global_point <- ggplot(global, aes(x = avg_realSum, y = avg_dist, fill = city, size = city_size)) +
+  geom_point() +
+  labs(
+    title = "Prix moyen d'un Airbnb par ville en fontion de la distance moyenne",
+    x = "Prix moyen",
+    y = "Distance moyenne",
+    color = "Ville",
+    size = "Rayon de présence"
+  ) +
+  scale_color_manual(values = colorVector) +
+  theme_minimal()
+combined_plot_global_point
 ```
 
-
+###1D: Graphe de Barres avec les prix moyens de chaque ville
 ```{r}
-graphe(amsterdam)
-graphe(athens)
+combined_plot_avg_bar <- ggplot(global, aes(x = reorder(city, avg_realSum), y = avg_realSum, fill = city)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label=avg_realSum), vjust=-0.3, size=3.5) +
+  labs(
+    title = "Prix moyen d'un Airbnb par ville",
+    y = "Prix",
+    color = "Ville"
+  ) +
+  scale_color_manual(values = colorVector) +
+  theme_minimal()
+combined_plot_avg_bar
 ```
 
-###FONCTION 2 HS
+###1E: Graphe Densité (Prix) pour plus de visibilité avec prix le plus probalble si on prend toutes les villes en considération
 ```{r}
-generate_airbnb_plots <- function(data) {
-  # Charger la bibliothèque ggplot2
-  library(ggplot2)
 
-  # Créer un graphique en lignes avec ggplot
-  line_chart <- ggplot(data, aes(x = dist, y = realSum, group = 1)) +
-    geom_line(color = "blue") +
-    labs(title = "Prix des Airbnb en fonction de la distance au centre-ville",
-         x = "Distance au centre-ville",
-         y = "Prix total de l'annonce") +
-    theme_minimal()
+  
+density_values <- density(combined_data_by_density$realSum)
+peak_x <- density_values$x[which.max(density_values$y)]
 
-  # Créer des graphiques de boxplots avec courbe de tendance pour chaque ville
-  boxplots <- ggplot(data, aes(x = as.factor(dist), y = realSum, fill = as.factor(dist))) +
-    geom_boxplot() +
-    geom_point(position = position_jitter(width = 0.2), alpha = 0.7) +
-    labs(title = "Boxplots avec Courbe de Tendance pour chaque ville",
-         x = "Distance au centre-ville",
-         y = "Prix total de l'annonce") +
-    theme_minimal()
+combined_plot_density <- ggplot(combined_data, aes(x = realSum, after_stat(count), fill = city)) +
+  geom_density(position="stack") +
+  labs(
+    title = "Prix des Airbnb",
+    x = "Prix total de l'annonce",
+    color = "Ville"
+  ) +
+  scale_color_manual(values = colorVector) +
+  theme_minimal() +
+  xlim(0,2300) +
+  geom_vline(xintercept = peak_x, color = "red") +
+  annotate("text", x = peak_x+650, y = 100, label = sprintf("Valeur la plus probable à %.2f", peak_x), vjust = -1)
 
-  # Afficher les graphiques
-  line_chart
-  boxplots
-}
-
-
+combined_plot_density
 ```
+
+
+
 
 
