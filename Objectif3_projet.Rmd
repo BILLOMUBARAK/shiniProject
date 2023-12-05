@@ -1,0 +1,164 @@
+---
+title: "Untitled"
+author: "Schegun Hounkpe"
+date: "2023-12-01"
+output: html_document
+---
+
+
+## Including Plots
+```{r}
+
+library(tidyverse) 
+library(readxl) 
+library(lubridate) 
+
+library(ggplot2)
+
+```
+
+
+```{r}
+amsterdam <- read.csv("data/amsterdam_weekends.csv")
+athens <- read.csv("data/athens_weekends.csv")
+barcelona <- read.csv("data/barcelona_weekends.csv")
+berlin <- read.csv("data/berlin_weekends.csv")
+budapest <- read.csv("data/budapest_weekends.csv")
+lisbon <- read.csv("data/lisbon_weekends.csv")
+london <- read.csv("data/london_weekends.csv")
+paris <- read.csv("data/paris_weekends.csv")
+rome <- read.csv("data/rome_weekends.csv")
+vienna <- read.csv("data/vienna_weekends.csv")
+
+#Creation liste de villes
+noms_des_data <- c("amsterdam", "athens", "barcelona","berlin","budapest","lisbon","london", "paris","rome","vienna")
+```
+##3-A Une barre est pour la satisfaction des clients et l'autre pour la propreté
+
+
+## Les graphiques en lien avec la note de propreté des clients
+
+
+```{r}
+
+
+
+for (nom_data in noms_des_data) {
+  
+  # Charger le jeu de données
+  les_data <- get(nom_data) 
+  
+  # Modifier le titre en fonction du nom de la ville
+  titre <- paste("Graphique à bar pour la  note de la propreté : ", nom_data)
+  
+  # Code ggplot2
+  graphique <- ggplot(data = les_data,
+         mapping = aes(x = cleanliness_rating, color = room_type, fill = room_type)) +
+    geom_bar() +
+    labs(title = titre,
+         x = "Note de la propreté",
+         y = "Compte")
+  # Afficher le graphique
+  print(graphique)
+}
+```
+
+## Les graphiques à propos de la satisfaction des clients
+
+
+```{r}
+
+
+for (nom_data in noms_des_data) {
+  
+  # Charger le jeu de données
+  les_data <- get(nom_data)  
+  
+  # Modifier le titre en fonction du nom de la ville
+  titre <- paste("Graphique à barre : satisfaction des clients à", nom_data)
+  
+  # Code ggplot2
+  graphique <- ggplot(data = les_data,
+         mapping = aes(x = guest_satisfaction_overall, color = room_type, fill = room_type)) +
+    geom_bar() +
+    labs(title = titre,
+         x = "Satisfaction",
+         y = "Compte")
+  # Afficher le graphique
+  print(graphique)
+}
+
+
+```
+
+
+
+
+
+
+
+##-3B: Graphe de ligne  pour la satisfaction en fonction de la propreté
+```{r}
+
+for (nom_data in noms_des_data) {
+  
+  # Charger le jeu de données
+  les_data <- get(nom_data) 
+  
+  # Modifier le titre en fonction du nom de la ville
+  titre <- paste("Graphique en ligne de la satisfaction en fonction de la propreté à ", nom_data)
+  
+  # Code ggplot2
+  graphique <- ggplot(data = les_data,
+ mapping = aes(x = guest_satisfaction_overall,y=cleanliness_rating))+ geom_line()+labs(title = titre,
+       x = "Note de la satisfaction",
+       y = "Note de la propreté")
+  
+  # Affiche le graphique
+  print(graphique)
+  
+}
+
+
+
+
+
+```
+##3-C Histogram  du prix en fonction de la satifaction et de la propreté
+
+```{r}
+for (nom_data in noms_des_data) {
+  
+  # Charger le jeu de données
+  les_data <- get(nom_data)  
+  
+  # Modifier le titre en fonction du nom de la ville
+  titre <- paste("Histogramme bidimensionnel du prix  en fonction de la satisfaction : ", nom_data)
+  
+  # Code ggplot2
+  graphique <- ggplot(les_data, aes(x = guest_satisfaction_overall, y = realSum, fill = as.factor(person_capacity))) +
+  geom_bin2d() +
+  scale_fill_manual(values = c("2" = "green", "3" = "blue", "4" = "red", "5" = "purple", "6" = "orange")) +
+  labs(title = titre,
+       x = "Satisfaction",
+       y = "Prix",
+       fill = "Capacité de personne")
+  
+  # Affiche le graphique
+  print(graphique)
+  
+}
+
+
+
+
+
+```
+
+```{r}
+
+
+```
+
+
+
