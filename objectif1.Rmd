@@ -60,32 +60,38 @@ combined_data_by_density <- combined_data %>% arrange(factor(city, levels = c('A
 ###À considérer si on fix des limites pour plus de visibilité
 ```{r}
 combined_plot_line <- ggplot(combined_data, aes(x = dist, y = realSum, color = city)) +
-  geom_line() +
+  geom_point(alpha = 0) +
   labs(
-    title = "Prix des Airbnb en fonction de la distance au centre-ville",
+    title = "Prix des Airbnbs en fonction de la distance au centre-ville en lignes de Regression",
     x = "Distance au centre-ville",
     y = "Prix total de l'annonce",
     color = "Ville"
   ) +
   scale_color_manual(values = colorVector) +
-  theme_minimal()
-combined_plot_line
+  theme_minimal() +
+  geom_smooth(method = "loess", formula = y ~ x) +
+  facet_wrap(~city, scales = "free_y") +
+  ylim(0,1000)
+suppressWarnings(print(combined_plot_line))
 ```
 
 ###1B: 1B: Graphe Nuage de point pour le prix moyen en fonction de la distance moyenne de la ville avec la taille des points variant en fonction de la taille de la ville (dist max)
 
 ```{r}
-combined_plot_global_point <- ggplot(global, aes(x = avg_realSum, y = avg_dist, fill = city, size = city_size)) +
+combined_plot_global_point <- ggplot(global %>% arrange(avg_dist, avg_realSum), 
+                                     aes(x = avg_realSum, y = avg_dist, fill = city, size = city_size, color = city)) +
   geom_point() +
   labs(
-    title = "Prix moyen d'un Airbnb par ville en fontion de la distance moyenne",
+    title = "Prix moyen d'un Airbnb par ville en fonction de la distance moyenne",
     x = "Prix moyen",
     y = "Distance moyenne",
     color = "Ville",
     size = "Rayon de présence"
   ) +
   scale_color_manual(values = colorVector) +
-  theme_minimal()
+  theme_minimal() +
+  guides(fill = FALSE)  # Remove the legend for the 'city' variable
+
 combined_plot_global_point
 ```
 
