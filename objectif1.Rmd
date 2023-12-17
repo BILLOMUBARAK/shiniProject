@@ -72,7 +72,7 @@ combined_plot_line <- ggplot(combined_data, aes(x = dist, y = realSum, color = c
 combined_plot_line
 ```
 
-###1B: 1B: Graphe Nuage de point pour le prix moyen en fonction de la distance moyenne de la ville avec la taille des points variant en fonction de la taille de la ville (dist max)
+###1B: 1B: Graphe Nuage de point pour le prix moyen en fonction de la distance moyenne de la ville avec la taille des points variant en fonction de la taille de la ville (dist max)4
 
 ```{r}
 combined_plot_global_point <- ggplot(global, aes(x = avg_realSum, y = avg_dist, fill = city, size = city_size)) +

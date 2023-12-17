@@ -36,7 +36,7 @@ noms_des_data <- c("amsterdam", "athens", "barcelona","berlin","budapest","lisbo
 ##3-A Une barre est pour la satisfaction des clients et l'autre pour la propreté
 
 
-## Les graphiques en lien avec la note de propreté des clients
+## la note de propreté des clients
 
 
 ```{r}
@@ -55,9 +55,11 @@ for (nom_data in noms_des_data) {
   graphique <- ggplot(data = les_data,
          mapping = aes(x = cleanliness_rating, color = room_type, fill = room_type)) +
     geom_bar() +
+    facet_wrap(vars(room_type))+
     labs(title = titre,
          x = "Note de la propreté",
-         y = "Compte")
+         y = "Compte")+
+    theme_minimal()
   # Afficher le graphique
   print(graphique)
 }
@@ -81,9 +83,11 @@ for (nom_data in noms_des_data) {
   graphique <- ggplot(data = les_data,
          mapping = aes(x = guest_satisfaction_overall, color = room_type, fill = room_type)) +
     geom_bar() +
+     facet_wrap(vars(room_type))+
     labs(title = titre,
          x = "Satisfaction",
-         y = "Compte")
+         y = "Compte")+
+    theme_minimal()
   # Afficher le graphique
   print(graphique)
 }
@@ -154,11 +158,3 @@ for (nom_data in noms_des_data) {
 
 
 ```
-
-```{r}
-
-
-```
-
-
-
